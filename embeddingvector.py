@@ -17,6 +17,17 @@ import torch
 import torchaudio
 import pandas as pd
 
+# ── Device: use MPS (Apple Silicon GPU) if available ─────────────────────────
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+    print("Using MPS (Apple Silicon GPU)")
+elif torch.cuda.is_available():
+    device = torch.device("cuda")
+    print("Using CUDA")
+else:
+    device = torch.device("cpu")
+    print("Using CPU")
+
 # ── Step 2: Load AST model ────────────────────────────────────────────────────
 # Keep CWD as AST/egs/audioset/ during instantiation so the model's hardcoded
 # relative path '../../pretrained_models/audioset_10_10_0.4593.pth' resolves correctly.
@@ -26,6 +37,7 @@ model = ASTModel(
     imagenet_pretrain=True,
     audioset_pretrain=True,
 )
+model = model.to(device)
 model.eval()
 
 os.chdir(_base_dir)  # restore working directory after model is loaded
@@ -79,7 +91,7 @@ def wav_to_spectrogram(wav_path, target_length=1024):
 
 # ── Steps 4 & 5: Forward pass + extract embedding ────────────────────────────
 def get_embedding(wav_path):
-    spec = wav_to_spectrogram(wav_path).unsqueeze(0)  # (1, 1024, 128)
+    spec = wav_to_spectrogram(wav_path).unsqueeze(0).to(device)  # (1, 1024, 128)
     with torch.no_grad():
         _ = model(spec)
     return _embedding_store["vector"].squeeze(0)  # (768,)

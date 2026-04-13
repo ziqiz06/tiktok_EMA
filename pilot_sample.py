@@ -47,11 +47,11 @@ print(f"\n  View bursts with >=1 URL      : {len(view_keys)}")
 print(f"  Of those, also in EMA file    : {len(candidate_bursts)}")
 print(f"  Unique PIDs in candidates     : {candidate_bursts['PID'].nunique()}")
 
-# ── STEP 2: Sample 20 bursts, spread across PIDs ─────────────────────────────
-TARGET_BURSTS = 20
-URLS_PER_BURST = 3
+# ── STEP 2: Sample 150 bursts, spread across PIDs ────────────────────────────
+TARGET_BURSTS = 150
+URLS_PER_BURST = 5
 
-# Prefer bursts with >=3 URLs
+# Prefer bursts with >=5 URLs
 good_bursts = candidate_bursts[candidate_bursts["n_urls"] >= URLS_PER_BURST].copy()
 
 # One burst per PID first, then fill
